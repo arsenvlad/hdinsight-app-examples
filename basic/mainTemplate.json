@@ -37,7 +37,7 @@
     "baseUrl": "https://raw.githubusercontent.com/arsenvlad/hdinsight-app-examples/master/basic/",
     "scriptUrlInstall": "[concat(variables('baseUrl'),'script.sh')]",
     "applicationName": "basic-app-edgenode",
-    "applicationSubDomain": "basic",
+    "applicationSubDomain": "bsc",
     "applicationPort": 80
   },
   "resources": [
@@ -60,20 +60,27 @@
         },
         "installScriptActions": [
           {
-            "name": "[concat(variables('applicationName'),'-head-worker-install')]",
+            "name": "[concat(variables('applicationName'),'-head-install')]",
             "uri": "[variables('scriptUrlInstall')]",
-            "parameters": "head-worker",
+            "parameters": "[concat('head',' ',parameters('clusterName'),' ',parameters('licenseKey'))]",
             "roles": [
-              "HeadNode",
-              "WorkerNode"
+              "headnode"
+            ]
+          },
+          {
+            "name": "[concat(variables('applicationName'),'-worker-install')]",
+            "uri": "[variables('scriptUrlInstall')]",
+            "parameters": "[concat('worker',' ',parameters('clusterName'),' ',parameters('licenseKey'))]",
+            "roles": [
+              "workernode"
             ]
           },
           {
             "name": "[concat(variables('applicationName'),'-edge-install')]",
             "uri": "[variables('scriptUrlInstall')]",
-            "parameters": "edge",
+            "parameters": "[concat('edge',' ',parameters('clusterName'),' ',parameters('licenseKey'))]",
             "roles": [
-              "EdgeNode"
+              "edgenode"
             ]
           }
         ],

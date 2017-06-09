@@ -1,0 +1,137 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the HDInsight cluster"
+      }
+    },
+    "galleryPackageIdentity": {
+      "type": "string",
+      "metadata": {
+        "description": "Any non-empty value is accepted. After the package is published, this parameter will be used to link the application install to the details about the application in the marketplace."
+      },
+      "defaultValue": "multiple-edge-nodes"
+    },
+    "edgeNodeSize": {
+      "type": "string",
+      "metadata": {
+        "description": "Size of the edge node that hosts the application"
+      },
+      "defaultValue": "Standard_D2_v2",
+      "allowedValues": [
+        "Standard_D2_v2"
+      ]
+    },
+    "licenseKey": {
+      "type": "string",
+      "metadata": {
+        "description": "This parameter is optional. If it is included the UI will display a textbox for a required License Key parameter."
+      }
+    }
+  },
+  "variables": {
+    "clusterAppApiVersion": "2015-03-01-preview",
+    "baseUrl": "https://raw.githubusercontent.com/arsenvlad/hdinsight-app-examples/master/multiple-edge-nodes/",
+    "scriptUrlInstall": "[concat(variables('baseUrl'),'script.sh')]",
+    "applicationName1": "app1",
+    "applicationSubDomain1": "aaa",
+    "applicationPort1": 80,
+    "applicationName2": "app2",
+    "applicationSubDomain2": "bbb"
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('clusterAppApiVersion')]",
+      "type": "Microsoft.HDInsight/clusters/applications",
+      "name": "[concat(parameters('clusterName'),'/', variables('applicationName1'))]",
+      "properties": {
+        "marketPlaceIdentifier": "[parameters('galleryPackageIdentity')]",
+        "computeProfile": {
+          "roles": [
+            {
+              "name": "edgenode",
+              "targetInstanceCount": 2,
+              "hardwareProfile": {
+                "vmSize": "[parameters('edgeNodeSize')]"
+              }
+            }
+          ]
+        },
+        "installScriptActions": [
+          {
+            "name": "[concat(variables('applicationName1'),'-edge-install')]",
+            "uri": "[variables('scriptUrlInstall')]",
+            "parameters": "[concat('edge',' ',parameters('clusterName'),' ',parameters('licenseKey'))]",
+            "roles": [
+              "edgenode"
+            ]
+          }
+        ],
+        "uninstallScriptActions": [],
+        "httpsEndpoints": [
+          {
+            "subDomainSuffix": "[variables('applicationSubDomain1')]",
+            "destinationPort": "[variables('applicationPort1')]",
+            "disableGatewayAuth": false,
+            "accessModes": [
+              "WebPage"
+            ]
+          },
+          {
+            "subDomainSuffix": "aab",
+            "destinationPort": "8888",
+            "disableGatewayAuth": false,
+            "accessModes": []
+          }
+        ],
+        "applicationType": "CustomApplication"
+      }
+    },
+    {
+      "apiVersion": "[variables('clusterAppApiVersion')]",
+      "type": "Microsoft.HDInsight/clusters/applications",
+      "name": "[concat(parameters('clusterName'),'/', variables('applicationName2'))]",
+      "properties": {
+        "marketPlaceIdentifier": "[parameters('galleryPackageIdentity')]",
+        "computeProfile": {
+          "roles": [
+            {
+              "name": "edgenode",
+              "targetInstanceCount": 2,
+              "hardwareProfile": {
+                "vmSize": "[parameters('edgeNodeSize')]"
+              }
+            }
+          ]
+        },
+        "installScriptActions": [
+          {
+            "name": "[concat(variables('applicationName2'),'-edge-install')]",
+            "uri": "[variables('scriptUrlInstall')]",
+            "parameters": "[concat('edge',' ',parameters('clusterName'),' ',parameters('licenseKey'))]",
+            "roles": [
+              "edgenode"
+            ]
+          }
+        ],
+        "uninstallScriptActions": [],
+        "httpsEndpoints": [
+        ],
+        "applicationType": "CustomApplication"
+      }
+    }
+  ],
+  "outputs": {
+    "application1": {
+      "type": "object",
+      "value": "[reference(resourceId('Microsoft.HDInsight/clusters/applications/',parameters('clusterName'), variables('applicationName1')))]"
+    },
+    "application2": {
+      "type": "object",
+      "value": "[reference(resourceId('Microsoft.HDInsight/clusters/applications/',parameters('clusterName'), variables('applicationName2')))]"
+    }
+  }
+}
