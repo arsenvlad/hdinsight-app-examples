@@ -34,7 +34,7 @@
   },
   "variables": {
     "clusterAppApiVersion": "2015-03-01-preview",
-    "baseUrl": "https://raw.githubusercontent.com/arsenvlad/hdinsight-app-examples/master/",
+    "baseUrl": "https://raw.githubusercontent.com/arsenvlad/hdinsight-app-examples/master/basic/",
     "scriptUrlInstall": "[concat(variables('baseUrl'),'script.sh')]",
     "applicationName": "basic-app-edgenode",
     "applicationSubDomain": "basic",
