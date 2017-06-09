@@ -20,9 +20,9 @@
       "metadata": {
         "description": "Size of the edge node that hosts the application"
       },
-      "defaultValue": "Standard_D2_v2",
+      "defaultValue": "Standard_D12_v2",
       "allowedValues": [
-        "Standard_D2_v2"
+        "Standard_D12_v2"
       ]
     },
     "licenseKey": {
@@ -36,11 +36,10 @@
     "clusterAppApiVersion": "2015-03-01-preview",
     "baseUrl": "https://raw.githubusercontent.com/arsenvlad/hdinsight-app-examples/master/multiple-edge-nodes/",
     "scriptUrlInstall": "[concat(variables('baseUrl'),'script.sh')]",
-    "applicationName1": "app1",
+    "applicationName1": "multi-app1",
     "applicationSubDomain1": "aaa",
     "applicationPort1": 80,
-    "applicationName2": "app2",
-    "applicationSubDomain2": "bbb"
+    "applicationName2": "multi-app2"
   },
   "resources": [
     {
@@ -53,7 +52,7 @@
           "roles": [
             {
               "name": "edgenode",
-              "targetInstanceCount": 2,
+              "targetInstanceCount": 1,
               "hardwareProfile": {
                 "vmSize": "[parameters('edgeNodeSize')]"
               }
@@ -94,6 +93,9 @@
       "apiVersion": "[variables('clusterAppApiVersion')]",
       "type": "Microsoft.HDInsight/clusters/applications",
       "name": "[concat(parameters('clusterName'),'/', variables('applicationName2'))]",
+      "dependsOn":[
+        "[concat('Microsoft.HDInsight/clusters/',parameters('clusterName'),'/applications/',variables('applicationName1'))]"
+      ],
       "properties": {
         "marketPlaceIdentifier": "[parameters('galleryPackageIdentity')]",
         "computeProfile": {
