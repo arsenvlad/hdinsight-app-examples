@@ -1,0 +1,101 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the HDInsight cluster"
+      }
+    },
+    "galleryPackageIdentity": {
+      "type": "string",
+      "metadata": {
+        "description": "Any non-empty value is accepted. After the package is published, this parameter will be used to link the application install to the details about the application in the marketplace."
+      },
+      "defaultValue": "basic-app"
+    },
+    "edgeNodeSize": {
+      "type": "string",
+      "metadata": {
+        "description": "Size of the edge node that hosts the application"
+      },
+      "defaultValue": "Standard_D12_v2",
+      "allowedValues": [
+        "Standard_D12_v2"
+      ]
+    },
+    "licenseKey": {
+      "type": "string",
+      "metadata": {
+        "description": "This parameter is optional. If it is included the UI will display a textbox for a required License Key parameter."
+      }
+    }
+  },
+  "variables": {
+    "clusterAppApiVersion": "2015-03-01-preview",
+    "baseUrl": "https://raw.githubusercontent.com/arsenvlad/hdinsight-app-examples/master/",
+    "scriptUrlInstall": "[concat(variables('baseUrl'),'script.sh')]",
+    "applicationName": "basic-app-edgenode",
+    "applicationSubDomain": "basic",
+    "applicationPort": 80
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('clusterAppApiVersion')]",
+      "type": "Microsoft.HDInsight/clusters/applications",
+      "name": "[concat(parameters('clusterName'),'/', variables('applicationName'))]",
+      "properties": {
+        "marketPlaceIdentifier": "[parameters('galleryPackageIdentity')]",
+        "computeProfile": {
+          "roles": [
+            {
+              "name": "edgenode",
+              "targetInstanceCount": 1,
+              "hardwareProfile": {
+                "vmSize": "[parameters('edgeNodeSize')]"
+              }
+            }
+          ]
+        },
+        "installScriptActions": [
+          {
+            "name": "[concat(variables('applicationName'),'-head-worker-install')]",
+            "uri": "[variables('scriptUrlInstall')]",
+            "parameters": "head-worker",
+            "roles": [
+              "HeadNode",
+              "WorkerNode"
+            ]
+          },
+          {
+            "name": "[concat(variables('applicationName'),'-edge-install')]",
+            "uri": "[variables('scriptUrlInstall')]",
+            "parameters": "edge",
+            "roles": [
+              "EdgeNode"
+            ]
+          }
+        ],
+        "uninstallScriptActions": [],
+        "httpsEndpoints": [
+          {
+            "subDomainSuffix": "[variables('applicationSubDomain')]",
+            "destinationPort": "[variables('applicationPort')]",
+            "disableGatewayAuth": false,
+            "accessModes": [
+              "WebPage"
+            ]
+          }
+        ],
+        "applicationType": "CustomApplication"
+      }
+    }
+  ],
+  "outputs": {
+    "application": {
+      "type": "object",
+      "value": "[reference(resourceId('Microsoft.HDInsight/clusters/applications/',parameters('clusterName'), variables('applicationName')))]"
+    }
+  }
+}
