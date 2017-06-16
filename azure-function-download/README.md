@@ -10,4 +10,4 @@ wget -O $fileName -q "https://hdiappdownload1.azurewebsites.net/api/download?lic
 [![Create Azure Function](images/azf-create.png)]
 
 ## Set Azure Function Settings
-[![Set Azure Function Settings]](images/azf-settings.png)]
+[![Set Azure Function Settings](images/azf-settings.png)]
