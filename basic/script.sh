@@ -6,7 +6,7 @@
 # If file cannot be downloaded an error message is output into /tmp/INVALID_LICENSE_KEY.txt file and the process terminates,
 # but returns success code so that the HDInsight Script Action does not show failure.
 downloadUsingLicenseKey() {
-        # Exit with success code so that script action 
+        # Exit with success code so that script action in HDInsight does not show a failure
         licenseKey=$1
         fileName=$2
         expectedSize=$3
