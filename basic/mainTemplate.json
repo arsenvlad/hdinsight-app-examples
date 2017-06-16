@@ -28,7 +28,7 @@
     "licenseKey": {
       "type": "string",
       "metadata": {
-        "description": "This parameter is optional. If it is included the UI will display a textbox for a required License Key parameter."
+        "description": "This parameter is optional. If it is included the UI will display a textbox for a required License Key parameter. You can try including a tool tip in the UI like this [get license key at https://github.com/](https://github.com/)."
       }
     }
   },
