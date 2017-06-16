@@ -32,9 +32,9 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         return req.CreateResponse(HttpStatusCode.Forbidden, "fileName and licenseKey cannot be null");
     }
 
-    // Check licenseKey value again a valid set
+    // Check licenseKey value against a valid set
     // NOTE: This is only an example. 
-    // You will want to store vaid license key strings in some data store (Azure SQL DB) 
+    // You will want to store valid license key strings in some data store (Azure SQL DB) 
     // that you can update easily when adding more keys.
     var validLicenseKeys = new string[] {
         "084cdc29-09d9-48a3-8e5d-e182deb7fcd7",
@@ -69,7 +69,7 @@ public static string GetBlobSasUri(CloudBlobContainer containerReference, string
     var adHocSas = new SharedAccessBlobPolicy() {
         // Set start time to five minutes before now to avoid clock skew
         SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
-        SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(60),
+        SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(minutes),
         Permissions = SharedAccessBlobPermissions.Read
     };
 
